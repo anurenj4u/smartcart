@@ -1,8 +1,9 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import { AddToCartButton } from '@/features/cart';
 import { getErrorMessage } from '@/shared/api';
 import type { ShopStackParamList } from '@/shared/navigation/types';
-import { spacing } from '@/shared/theme';
+import { colors, spacing } from '@/shared/theme';
 import { AppText, LoadingView, MessageView } from '@/shared/ui';
 import { ImageGallery } from '../components/ImageGallery';
 import { ProductPrice } from '../components/ProductPrice';
@@ -40,6 +41,7 @@ export function ProductDetailsScreen({ navigation, route }: Props) {
   const images = product.images.length > 0 ? product.images : [product.thumbnail];
 
   return (
+    <View style={styles.screen}>
     <ScrollView contentContainerStyle={styles.content}>
       <ImageGallery images={images} title={product.title} />
 
@@ -86,10 +88,23 @@ export function ProductDetailsScreen({ navigation, route }: Props) {
         }
       />
     </ScrollView>
+    <View style={styles.footer}>
+      <AddToCartButton product={product} />
+    </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
+  footer: {
+    padding: spacing.md,
+    backgroundColor: colors.surface,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+  },
   content: {
     gap: spacing.xl,
     paddingBottom: spacing.xxl,

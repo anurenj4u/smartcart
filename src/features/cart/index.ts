@@ -1,3 +1,4 @@
+export { AddToCartButton } from './components/AddToCartButton';
 export {
   useCartItemCount,
   useCartItemQuantity,
