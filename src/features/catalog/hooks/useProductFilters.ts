@@ -37,7 +37,9 @@ export function useProductFilters() {
     setRefinements,
     activeRefinementCount,
     hasActiveFilters:
-      searchText.trim() !== '' || category !== null || activeRefinementCount > 0,
+      searchText.trim() !== '' ||
+      category !== null ||
+      activeRefinementCount > 0,
     reset,
   };
 }

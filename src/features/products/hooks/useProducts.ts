@@ -8,11 +8,7 @@ import type { ProductFilters } from '@/features/catalog';
 import { getCatalog, getProducts } from '../api/productsApi';
 import { productKeys } from '../api/queryKeys';
 import type { ProductsPage } from '../types';
-import {
-  filterCatalog,
-  needsCatalog,
-  paginate,
-} from '../utils/productFilters';
+import { filterCatalog, needsCatalog, paginate } from '../utils/productFilters';
 
 const PAGE_SIZE = 20;
 const CATALOG_STALE_TIME_MS = 5 * 60 * 1000;

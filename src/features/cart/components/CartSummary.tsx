@@ -13,8 +13,8 @@ export function CartSummary({ totals }: CartSummaryProps) {
     <View style={styles.summary}>
       <View style={styles.row}>
         <AppText color="textMuted">
-          Subtotal ({totals.itemCount} {totals.itemCount === 1 ? 'item' : 'items'}
-          )
+          Subtotal ({totals.itemCount}{' '}
+          {totals.itemCount === 1 ? 'item' : 'items'})
         </AppText>
         <AppText>{formatCents(totals.subtotalCents)}</AppText>
       </View>

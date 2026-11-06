@@ -10,12 +10,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-  colors,
-  radius,
-  spacing,
-  typography,
-} from '@/shared/theme';
+import { colors, radius, spacing, typography } from '@/shared/theme';
 import { AppText, Button, Chip } from '@/shared/ui';
 import type { ProductRefinements, ProductSort } from '../types';
 import { DEFAULT_REFINEMENTS, parsePriceInput } from '../utils/refinements';
@@ -105,7 +100,9 @@ export function FilterSheet({
           onPress={onClose}
           style={styles.backdrop}
         />
-        <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.lg }]}>
+        <View
+          style={[styles.sheet, { paddingBottom: insets.bottom + spacing.lg }]}
+        >
           <View style={styles.header}>
             <AppText variant="heading">Sort and filter</AppText>
             <Pressable

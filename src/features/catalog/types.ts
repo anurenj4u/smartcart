@@ -3,7 +3,11 @@ export type Category = {
   name: string;
 };
 
-export type ProductSort = 'default' | 'price-asc' | 'price-desc' | 'rating-desc';
+export type ProductSort =
+  | 'default'
+  | 'price-asc'
+  | 'price-desc'
+  | 'rating-desc';
 
 export type ProductRefinements = {
   sort: ProductSort;

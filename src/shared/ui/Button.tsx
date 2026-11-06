@@ -38,13 +38,16 @@ export function Button({
       style={({ pressed }) => [
         styles.base,
         isPrimary ? styles.primary : styles.secondary,
-        pressed && (isPrimary ? styles.primaryPressed : styles.secondaryPressed),
+        pressed &&
+          (isPrimary ? styles.primaryPressed : styles.secondaryPressed),
         isInactive && styles.inactive,
         style,
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={isPrimary ? colors.onPrimary : colors.primary} />
+        <ActivityIndicator
+          color={isPrimary ? colors.onPrimary : colors.primary}
+        />
       ) : (
         <AppText variant="label" color={isPrimary ? 'onPrimary' : 'primary'}>
           {label}
