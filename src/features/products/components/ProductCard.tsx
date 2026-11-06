@@ -1,4 +1,5 @@
 import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { WishlistButton } from '@/features/wishlist';
 import { colors, radius, spacing } from '@/shared/theme';
 import { AppText } from '@/shared/ui';
 import { formatCents } from '@/shared/utils/money';
@@ -29,6 +30,7 @@ export function ProductCard({ product, onPress }: ProductCardProps) {
         style={styles.image}
         resizeMode="contain"
       />
+      <WishlistButton product={product} style={styles.wishlist} />
       <View style={styles.body}>
         <AppText variant="label" numberOfLines={2} style={styles.title}>
           {product.title}
@@ -63,6 +65,11 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 1,
     backgroundColor: colors.surfaceMuted,
+  },
+  wishlist: {
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
   },
   body: {
     gap: spacing.xs,
