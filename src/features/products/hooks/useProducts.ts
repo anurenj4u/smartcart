@@ -15,6 +15,7 @@ import {
 } from '../utils/productFilters';
 
 const PAGE_SIZE = 20;
+const CATALOG_STALE_TIME_MS = 5 * 60 * 1000;
 
 const flattenPages = (data: InfiniteData<ProductsPage>) =>
   data.pages.flatMap(page => page.products);
@@ -38,6 +39,7 @@ export function useProducts(filters: ProductFilters) {
       const catalog = await queryClient.fetchQuery({
         queryKey: productKeys.catalog(),
         queryFn: ({ signal: catalogSignal }) => getCatalog(catalogSignal),
+        staleTime: CATALOG_STALE_TIME_MS,
       });
 
       return paginate(filterCatalog(catalog, filters), pageParam, PAGE_SIZE);

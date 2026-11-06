@@ -1,7 +1,13 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
-import { CategoryBar, SearchBar, useProductFilters } from '@/features/catalog';
+import {
+  CategoryBar,
+  FilterButton,
+  FilterSheet,
+  SearchBar,
+  useProductFilters,
+} from '@/features/catalog';
 import { getErrorMessage } from '@/shared/api';
 import type { ShopStackParamList } from '@/shared/navigation/types';
 import { colors, spacing } from '@/shared/theme';
@@ -16,9 +22,12 @@ type Props = NativeStackScreenProps<ShopStackParamList, 'ProductList'>;
 export function ProductListScreen({ navigation }: Props) {
   const {
     filters,
+    refinements,
     searchText,
     setSearchText,
     setCategory,
+    setRefinements,
+    activeRefinementCount,
     hasActiveFilters,
     reset,
   } = useProductFilters();
@@ -36,6 +45,7 @@ export function ProductListScreen({ navigation }: Props) {
     refresh,
   } = useProducts(filters);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const listRef = useRef<FlatList<ProductSummary>>(null);
 
   useEffect(() => {
@@ -112,7 +122,7 @@ export function ProductListScreen({ navigation }: Props) {
         ListEmptyComponent={
           <MessageView
             title="No products found"
-            description="Try a different search or category."
+            description="Try a different search, category or filter."
             actionLabel={hasActiveFilters ? 'Clear filters' : undefined}
             onAction={reset}
           />
@@ -135,9 +145,23 @@ export function ProductListScreen({ navigation }: Props) {
     <View style={styles.screen}>
       <View style={styles.searchRow}>
         <SearchBar value={searchText} onChangeText={setSearchText} />
+        <FilterButton
+          activeCount={activeRefinementCount}
+          onPress={() => setIsFilterSheetOpen(true)}
+        />
       </View>
       <CategoryBar selected={filters.category} onSelect={setCategory} />
       <View style={styles.results}>{renderResults()}</View>
+      {isFilterSheetOpen ? (
+        <FilterSheet
+          refinements={refinements}
+          onApply={next => {
+            setRefinements(next);
+            setIsFilterSheetOpen(false);
+          }}
+          onClose={() => setIsFilterSheetOpen(false)}
+        />
+      ) : null}
     </View>
   );
 }

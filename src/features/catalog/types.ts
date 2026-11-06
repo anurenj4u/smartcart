@@ -3,7 +3,16 @@ export type Category = {
   name: string;
 };
 
-export type ProductFilters = {
+export type ProductSort = 'default' | 'price-asc' | 'price-desc' | 'rating-desc';
+
+export type ProductRefinements = {
+  sort: ProductSort;
+  minPrice: number | null;
+  maxPrice: number | null;
+  minRating: number | null;
+};
+
+export type ProductFilters = ProductRefinements & {
   query: string;
   category: string | null;
 };

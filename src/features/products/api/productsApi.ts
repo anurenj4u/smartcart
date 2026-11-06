@@ -1,6 +1,7 @@
 import type { ProductFilters } from '@/features/catalog';
 import { request } from '@/shared/api';
 import type { CatalogProduct, Product, ProductsPage } from '../types';
+import { getServerSort } from '../utils/productFilters';
 
 const SUMMARY_FIELDS = 'title,price,discountPercentage,rating,stock,thumbnail';
 const CATALOG_FIELDS = `${SUMMARY_FIELDS},description,category`;
@@ -18,7 +19,7 @@ export function getProducts({
   filters,
   signal,
 }: GetProductsParams) {
-  const { query, category } = filters;
+  const { query, category, sort } = filters;
   let path = '/products';
 
   if (query) {
@@ -33,6 +34,7 @@ export function getProducts({
       skip,
       limit,
       select: SUMMARY_FIELDS,
+      ...getServerSort(sort),
     },
     signal,
   });
