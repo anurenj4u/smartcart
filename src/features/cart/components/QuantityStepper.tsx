@@ -7,6 +7,7 @@ type QuantityStepperProps = {
   label: string;
   quantity: number;
   max: number;
+  compact?: boolean;
   onChange: (quantity: number) => void;
 };
 
@@ -14,9 +15,11 @@ export function QuantityStepper({
   label,
   quantity,
   max,
+  compact = false,
   onChange,
 }: QuantityStepperProps) {
   const isAtMax = quantity >= max;
+  const buttonStyle = compact ? styles.compactButton : styles.button;
 
   return (
     <View style={styles.stepper}>
@@ -26,7 +29,7 @@ export function QuantityStepper({
           quantity === 1 ? `Remove ${label}` : `Decrease ${label} quantity`
         }
         onPress={() => onChange(quantity - 1)}
-        style={styles.button}
+        style={buttonStyle}
       >
         <Minus size={18} color={colors.primary} />
       </Pressable>
@@ -43,7 +46,7 @@ export function QuantityStepper({
         accessibilityState={{ disabled: isAtMax }}
         disabled={isAtMax}
         onPress={() => onChange(quantity + 1)}
-        style={[styles.button, isAtMax && styles.disabled]}
+        style={[buttonStyle, isAtMax && styles.disabled]}
       >
         <Plus size={18} color={colors.primary} />
       </Pressable>
@@ -63,6 +66,12 @@ const styles = StyleSheet.create({
   button: {
     width: 44,
     height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  compactButton: {
+    width: 38,
+    height: 38,
     alignItems: 'center',
     justifyContent: 'center',
   },

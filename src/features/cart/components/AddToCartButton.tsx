@@ -6,6 +6,8 @@ import { useCartStore } from '../store/cartStore';
 import type { CartProduct } from '../types';
 import { QuantityStepper } from './QuantityStepper';
 
+const COMPACT_HEIGHT = 40;
+
 type AddToCartButtonProps = {
   product: CartProduct;
   compact?: boolean;
@@ -52,6 +54,7 @@ export function AddToCartButton({
         label={product.title}
         quantity={quantity}
         max={product.stock}
+        compact={compact}
         onChange={next => setQuantity(product.id, next)}
       />
     </View>
@@ -67,10 +70,11 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   compactButton: {
+    minHeight: COMPACT_HEIGHT,
     paddingHorizontal: spacing.sm,
   },
   compactInCart: {
-    minHeight: 48,
+    minHeight: COMPACT_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
   },
