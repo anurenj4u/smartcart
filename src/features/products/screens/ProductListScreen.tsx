@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { CategoryBar } from '@/features/catalog';
 import { getErrorMessage } from '@/shared/api';
@@ -9,10 +9,12 @@ import { AppText, LoadingView, MessageView } from '@/shared/ui';
 import { ProductCard } from '../components/ProductCard';
 import { ProductListFooter } from '../components/ProductListFooter';
 import { useProducts } from '../hooks/useProducts';
+import type { ProductSummary } from '../types';
 
 type Props = NativeStackScreenProps<ShopStackParamList, 'ProductList'>;
 
 export function ProductListScreen({ navigation }: Props) {
+  const [category, setCategory] = useState<string | null>(null);
   const {
     data: products,
     error,
@@ -21,11 +23,16 @@ export function ProductListScreen({ navigation }: Props) {
     isFetchingNextPage,
     isFetchNextPageError,
     isPending,
+    isPlaceholderData,
     isRefetchError,
     refetch,
-  } = useProducts();
-  const [category, setCategory] = useState<string | null>(null);
+  } = useProducts(category);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const listRef = useRef<FlatList<ProductSummary>>(null);
+
+  useEffect(() => {
+    listRef.current?.scrollToOffset({ offset: 0, animated: false });
+  }, [category]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -34,7 +41,12 @@ export function ProductListScreen({ navigation }: Props) {
   };
 
   const handleEndReached = () => {
-    if (hasNextPage && !isFetchingNextPage && !isFetchNextPageError) {
+    if (
+      hasNextPage &&
+      !isFetchingNextPage &&
+      !isFetchNextPageError &&
+      !isPlaceholderData
+    ) {
       fetchNextPage();
     }
   };
@@ -57,9 +69,11 @@ export function ProductListScreen({ navigation }: Props) {
 
     return (
       <FlatList
+        ref={listRef}
         data={products}
         numColumns={2}
         keyExtractor={item => String(item.id)}
+        style={isPlaceholderData && styles.updating}
         contentContainerStyle={styles.content}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.5}
@@ -88,7 +102,7 @@ export function ProductListScreen({ navigation }: Props) {
         ListEmptyComponent={
           <MessageView
             title="No products found"
-            description="Check back soon for new arrivals."
+            description="Try a different category."
           />
         }
         renderItem={({ item }) => (
@@ -119,6 +133,9 @@ const styles = StyleSheet.create({
   },
   results: {
     flex: 1,
+  },
+  updating: {
+    opacity: 0.5,
   },
   content: {
     flexGrow: 1,

@@ -1,14 +1,22 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  type InfiniteData,
+} from '@tanstack/react-query';
 import { getProducts } from '../api/productsApi';
 import { productKeys } from '../api/queryKeys';
+import type { ProductsPage } from '../types';
 
 const PAGE_SIZE = 20;
 
-export function useProducts() {
+const flattenPages = (data: InfiniteData<ProductsPage>) =>
+  data.pages.flatMap(page => page.products);
+
+export function useProducts(category: string | null) {
   return useInfiniteQuery({
-    queryKey: productKeys.lists(),
+    queryKey: productKeys.list(category),
     queryFn: ({ pageParam, signal }) =>
-      getProducts({ skip: pageParam, limit: PAGE_SIZE, signal }),
+      getProducts({ skip: pageParam, limit: PAGE_SIZE, category, signal }),
     initialPageParam: 0,
     getNextPageParam: lastPage => {
       const nextSkip = lastPage.skip + lastPage.products.length;
@@ -16,6 +24,7 @@ export function useProducts() {
         ? nextSkip
         : undefined;
     },
-    select: data => data.pages.flatMap(page => page.products),
+    select: flattenPages,
+    placeholderData: keepPreviousData,
   });
 }
