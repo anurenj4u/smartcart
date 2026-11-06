@@ -1,4 +1,5 @@
 export { AddToCartButton } from './components/AddToCartButton';
+export { CartSummary } from './components/CartSummary';
 export {
   useCartItemCount,
   useCartItemQuantity,

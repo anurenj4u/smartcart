@@ -1,15 +1,15 @@
-import { useNavigation, type NavigationProp } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
-import type { RootTabParamList } from '@/shared/navigation/types';
+import type { CartStackNavigation } from '@/shared/navigation/types';
 import { colors, spacing } from '@/shared/theme';
-import { AppText, MessageView } from '@/shared/ui';
+import { AppText, Button, MessageView } from '@/shared/ui';
 import { CartItemRow } from '../components/CartItemRow';
 import { CartSummary } from '../components/CartSummary';
 import { useCartTotals } from '../hooks/useCartSelectors';
 import { useCartStore } from '../store/cartStore';
 
 export function CartScreen() {
-  const navigation = useNavigation<NavigationProp<RootTabParamList>>();
+  const navigation = useNavigation<CartStackNavigation>();
   const items = useCartStore(state => state.items);
   const clear = useCartStore(state => state.clear);
   const totals = useCartTotals();
@@ -67,6 +67,10 @@ export function CartScreen() {
       />
       <View style={styles.footer}>
         <CartSummary totals={totals} />
+        <Button
+          label="Checkout"
+          onPress={() => navigation.navigate('Checkout')}
+        />
       </View>
     </View>
   );
@@ -86,6 +90,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   footer: {
+    gap: spacing.md,
     padding: spacing.lg,
     backgroundColor: colors.surface,
     borderTopWidth: StyleSheet.hairlineWidth,

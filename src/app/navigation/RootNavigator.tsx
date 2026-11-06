@@ -5,11 +5,12 @@ import {
   type Theme,
 } from '@react-navigation/native';
 import { Heart, ReceiptText, ShoppingCart, Store } from 'lucide-react-native';
-import { CartScreen, useCartItemCount } from '@/features/cart';
+import { useCartItemCount } from '@/features/cart';
 import { OrdersScreen } from '@/features/orders';
 import { WishlistScreen } from '@/features/wishlist';
 import type { RootTabParamList } from '@/shared/navigation/types';
 import { colors } from '@/shared/theme';
+import { CartNavigator } from './CartNavigator';
 import { ShopNavigator } from './ShopNavigator';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -68,9 +69,11 @@ export function RootNavigator() {
         />
         <Tab.Screen
           name="CartTab"
-          component={CartScreen}
+          component={CartNavigator}
           options={{
             title: 'Cart',
+            headerShown: false,
+            popToTopOnBlur: true,
             tabBarIcon: CartIcon,
             tabBarBadge: cartItemCount > 0 ? cartItemCount : undefined,
             tabBarBadgeStyle: { backgroundColor: colors.primary },
