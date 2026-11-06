@@ -16,6 +16,10 @@ module.exports = {
   },
   overrides: [
     {
+      files: ['jest.setup.js'],
+      env: { jest: true },
+    },
+    {
       files: ['src/shared/**'],
       rules: {
         'no-restricted-imports': [
