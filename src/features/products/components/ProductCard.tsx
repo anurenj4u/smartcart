@@ -1,10 +1,11 @@
-import { Star } from 'lucide-react-native';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { colors, radius, spacing } from '@/shared/theme';
 import { AppText } from '@/shared/ui';
 import { formatCents } from '@/shared/utils/money';
 import type { ProductSummary } from '../types';
 import { getProductPricing } from '../utils/pricing';
+import { ProductPrice } from './ProductPrice';
+import { ProductRating } from './ProductRating';
 
 type ProductCardProps = {
   product: ProductSummary;
@@ -12,16 +13,14 @@ type ProductCardProps = {
 };
 
 export function ProductCard({ product, onPress }: ProductCardProps) {
-  const { listCents, finalCents, hasDiscount } = getProductPricing(product);
-  const isOutOfStock = product.stock === 0;
-  const rating = product.rating.toFixed(1);
+  const { finalCents } = getProductPricing(product);
 
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${product.title}, ${formatCents(
         finalCents,
-      )}, rated ${rating} out of 5`}
+      )}, rated ${product.rating.toFixed(1)} out of 5`}
       onPress={onPress}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
@@ -34,30 +33,10 @@ export function ProductCard({ product, onPress }: ProductCardProps) {
         <AppText variant="label" numberOfLines={2} style={styles.title}>
           {product.title}
         </AppText>
-        <View style={styles.priceRow}>
-          <AppText variant="heading">{formatCents(finalCents)}</AppText>
-          {hasDiscount ? (
-            <AppText
-              variant="caption"
-              color="textMuted"
-              style={styles.listPrice}
-            >
-              {formatCents(listCents)}
-            </AppText>
-          ) : null}
-        </View>
+        <ProductPrice product={product} />
         <View style={styles.metaRow}>
-          <View style={styles.rating}>
-            <Star
-              size={14}
-              color={colors.rating}
-              fill={colors.rating}
-            />
-            <AppText variant="caption" color="textMuted">
-              {rating}
-            </AppText>
-          </View>
-          {isOutOfStock ? (
+          <ProductRating rating={product.rating} />
+          {product.stock === 0 ? (
             <AppText variant="caption" color="danger">
               Out of stock
             </AppText>
@@ -92,24 +71,10 @@ const styles = StyleSheet.create({
   title: {
     minHeight: 36,
   },
-  priceRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'baseline',
-    columnGap: spacing.sm,
-  },
-  listPrice: {
-    textDecorationLine: 'line-through',
-  },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.sm,
-  },
-  rating: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
   },
 });
