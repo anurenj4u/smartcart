@@ -8,12 +8,13 @@ import { ImageGallery } from '../components/ImageGallery';
 import { ProductPrice } from '../components/ProductPrice';
 import { ProductRating } from '../components/ProductRating';
 import { ProductReviews } from '../components/ProductReviews';
+import { SimilarProducts } from '../components/SimilarProducts';
 import { useProduct } from '../hooks/useProduct';
 import { getStockLabel } from '../utils/stock';
 
 type Props = NativeStackScreenProps<ShopStackParamList, 'ProductDetails'>;
 
-export function ProductDetailsScreen({ route }: Props) {
+export function ProductDetailsScreen({ navigation, route }: Props) {
   const {
     data: product,
     error,
@@ -77,6 +78,13 @@ export function ProductDetailsScreen({ route }: Props) {
           <ProductReviews reviews={product.reviews} />
         </View>
       ) : null}
+
+      <SimilarProducts
+        product={product}
+        onSelect={productId =>
+          navigation.push('ProductDetails', { productId })
+        }
+      />
     </ScrollView>
   );
 }

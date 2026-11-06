@@ -7,4 +7,6 @@ export const productKeys = {
   list: (filters: ProductFilters) =>
     [...productKeys.lists(), filters] as const,
   detail: (id: number) => [...productKeys.all, 'detail', id] as const,
+  similarCandidates: (category: string) =>
+    [...productKeys.all, 'similar-candidates', category] as const,
 };

@@ -33,6 +33,11 @@ export type CatalogProduct = ProductSummary & {
   category: string;
 };
 
+export type SimilarCandidate = ProductSummary & {
+  brand?: string;
+  tags: string[];
+};
+
 export type ProductsPage = {
   products: ProductSummary[];
   total: number;
