@@ -1,7 +1,19 @@
-import { focusManager, QueryClientProvider } from '@tanstack/react-query';
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+import { focusManager } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import type { PropsWithChildren } from 'react';
 import { AppState } from 'react-native';
 import { queryClient } from '@/shared/api';
+import { appStorage } from '@/shared/storage/appStorage';
+
+const CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+const CACHE_VERSION = '1';
+
+const persister = createSyncStoragePersister({
+  storage: appStorage,
+  key: 'query-cache',
+  throttleTime: 1000,
+});
 
 focusManager.setEventListener(setFocused => {
   const subscription = AppState.addEventListener('change', state => {
@@ -13,6 +25,15 @@ focusManager.setEventListener(setFocused => {
 
 export function QueryProvider({ children }: PropsWithChildren) {
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{
+        persister,
+        maxAge: CACHE_MAX_AGE_MS,
+        buster: CACHE_VERSION,
+      }}
+    >
+      {children}
+    </PersistQueryClientProvider>
   );
 }
