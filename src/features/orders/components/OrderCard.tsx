@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { colors, radius, spacing } from '@/shared/theme';
 import { AppText } from '@/shared/ui';
@@ -19,7 +20,9 @@ const formatDate = (date: string) =>
     minute: '2-digit',
   });
 
-export function OrderCard({ order }: OrderCardProps) {
+export const OrderCard = memo(function OrderCardView({
+  order,
+}: OrderCardProps) {
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -58,7 +61,7 @@ export function OrderCard({ order }: OrderCardProps) {
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {

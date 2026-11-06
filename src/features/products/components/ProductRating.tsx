@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Star } from 'lucide-react-native';
 import { StyleSheet, View } from 'react-native';
 import { colors, spacing } from '@/shared/theme';
@@ -7,7 +8,9 @@ type ProductRatingProps = {
   rating: number;
 };
 
-export function ProductRating({ rating }: ProductRatingProps) {
+export const ProductRating = memo(function ProductRatingView({
+  rating,
+}: ProductRatingProps) {
   return (
     <View style={styles.row}>
       <Star size={14} color={colors.rating} fill={colors.rating} />
@@ -16,7 +19,7 @@ export function ProductRating({ rating }: ProductRatingProps) {
       </AppText>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   row: {

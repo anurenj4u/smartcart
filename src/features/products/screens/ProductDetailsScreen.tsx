@@ -1,4 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useCallback, useMemo } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { AddToCartButton } from '@/features/cart';
 import { WishlistButton } from '@/features/wishlist';
@@ -25,6 +26,17 @@ export function ProductDetailsScreen({ navigation, route }: Props) {
     refetch,
   } = useProduct(route.params.productId);
 
+  const openSimilarProduct = useCallback(
+    (productId: number) => navigation.push('ProductDetails', { productId }),
+    [navigation],
+  );
+
+  const images = useMemo(
+    () =>
+      product?.images.length ? product.images : [product?.thumbnail ?? ''],
+    [product],
+  );
+
   if (isPending && isPaused) {
     return (
       <MessageView
@@ -48,9 +60,6 @@ export function ProductDetailsScreen({ navigation, route }: Props) {
       />
     );
   }
-
-  const images =
-    product.images.length > 0 ? product.images : [product.thumbnail];
 
   return (
     <View style={styles.screen}>
@@ -98,12 +107,7 @@ export function ProductDetailsScreen({ navigation, route }: Props) {
           </View>
         ) : null}
 
-        <SimilarProducts
-          product={product}
-          onSelect={productId =>
-            navigation.push('ProductDetails', { productId })
-          }
-        />
+        <SimilarProducts product={product} onSelect={openSimilarProduct} />
       </ScrollView>
       <View style={styles.footer}>
         <AddToCartButton product={product} />

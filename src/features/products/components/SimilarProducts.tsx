@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -18,7 +19,10 @@ type SimilarProductsProps = {
   onSelect: (productId: number) => void;
 };
 
-export function SimilarProducts({ product, onSelect }: SimilarProductsProps) {
+export const SimilarProducts = memo(function SimilarProductsView({
+  product,
+  onSelect,
+}: SimilarProductsProps) {
   const { similarProducts, isPaused, isPending, refetch } =
     useSimilarProducts(product);
 
@@ -69,7 +73,7 @@ export function SimilarProducts({ product, onSelect }: SimilarProductsProps) {
       {renderContent()}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   section: {

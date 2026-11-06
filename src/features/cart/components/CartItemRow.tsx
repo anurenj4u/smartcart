@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Trash2 } from 'lucide-react-native';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { colors, radius, spacing } from '@/shared/theme';
@@ -11,10 +12,13 @@ const IMAGE_SIZE = 88;
 
 type CartItemRowProps = {
   item: CartItem;
-  onPress: () => void;
+  onPress: (productId: number) => void;
 };
 
-export function CartItemRow({ item, onPress }: CartItemRowProps) {
+export const CartItemRow = memo(function CartItemRowView({
+  item,
+  onPress,
+}: CartItemRowProps) {
   const setQuantity = useCartStore(state => state.setQuantity);
   const removeItem = useCartStore(state => state.removeItem);
 
@@ -23,7 +27,7 @@ export function CartItemRow({ item, onPress }: CartItemRowProps) {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`View ${item.title}`}
-        onPress={onPress}
+        onPress={() => onPress(item.productId)}
         style={styles.product}
       >
         <Image
@@ -65,7 +69,7 @@ export function CartItemRow({ item, onPress }: CartItemRowProps) {
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   row: {

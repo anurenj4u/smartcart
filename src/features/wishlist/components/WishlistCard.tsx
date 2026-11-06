@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Star } from 'lucide-react-native';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { AddToCartButton } from '@/features/cart';
@@ -10,10 +11,13 @@ import { WishlistButton } from './WishlistButton';
 
 type WishlistCardProps = {
   item: WishlistProduct;
-  onPress: () => void;
+  onPress: (productId: number) => void;
 };
 
-export function WishlistCard({ item, onPress }: WishlistCardProps) {
+export const WishlistCard = memo(function WishlistCardView({
+  item,
+  onPress,
+}: WishlistCardProps) {
   const { listCents, finalCents, hasDiscount } = getProductPricing(item);
   const discountPercent = Math.round(item.discountPercentage);
 
@@ -22,7 +26,7 @@ export function WishlistCard({ item, onPress }: WishlistCardProps) {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`View ${item.title}`}
-        onPress={onPress}
+        onPress={() => onPress(item.id)}
         style={({ pressed }) => [styles.product, pressed && styles.pressed]}
       >
         <Image
@@ -71,7 +75,7 @@ export function WishlistCard({ item, onPress }: WishlistCardProps) {
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {

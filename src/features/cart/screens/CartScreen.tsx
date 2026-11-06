@@ -1,5 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
-import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { useCallback } from 'react';
+import {
+  Alert,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  View,
+  type ListRenderItem,
+} from 'react-native';
 import type { CartStackNavigation } from '@/shared/navigation/types';
 import { colors, spacing } from '@/shared/theme';
 import { AppText, Button, MessageView } from '@/shared/ui';
@@ -7,12 +15,30 @@ import { CartItemRow } from '../components/CartItemRow';
 import { CartSummary } from '../components/CartSummary';
 import { useCartTotals } from '../hooks/useCartSelectors';
 import { useCartStore } from '../store/cartStore';
+import type { CartItem } from '../types';
+
+const getItemKey = (item: CartItem) => String(item.productId);
 
 export function CartScreen() {
   const navigation = useNavigation<CartStackNavigation>();
   const items = useCartStore(state => state.items);
   const clear = useCartStore(state => state.clear);
   const totals = useCartTotals();
+
+  const openProduct = useCallback(
+    (productId: number) =>
+      navigation.navigate('ShopTab', {
+        screen: 'ProductDetails',
+        params: { productId },
+        initial: false,
+      }),
+    [navigation],
+  );
+
+  const renderItem = useCallback<ListRenderItem<CartItem>>(
+    ({ item }) => <CartItemRow item={item} onPress={openProduct} />,
+    [openProduct],
+  );
 
   const confirmClear = () => {
     Alert.alert('Clear your cart?', 'This removes every item from your cart.', [
@@ -38,20 +64,9 @@ export function CartScreen() {
     <View style={styles.screen}>
       <FlatList
         data={items}
-        keyExtractor={item => String(item.productId)}
+        keyExtractor={getItemKey}
         contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <CartItemRow
-            item={item}
-            onPress={() =>
-              navigation.navigate('ShopTab', {
-                screen: 'ProductDetails',
-                params: { productId: item.productId },
-                initial: false,
-              })
-            }
-          />
-        )}
+        renderItem={renderItem}
         ListFooterComponent={
           <Pressable
             accessibilityRole="button"

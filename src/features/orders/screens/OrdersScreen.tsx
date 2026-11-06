@@ -1,10 +1,16 @@
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
-import { FlatList, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet, type ListRenderItem } from 'react-native';
 import type { RootTabParamList } from '@/shared/navigation/types';
 import { spacing } from '@/shared/theme';
 import { MessageView } from '@/shared/ui';
 import { OrderCard } from '../components/OrderCard';
 import { useOrdersStore } from '../store/ordersStore';
+import type { Order } from '../types';
+
+const getOrderKey = (order: Order) => order.id;
+const renderOrder: ListRenderItem<Order> = ({ item }) => (
+  <OrderCard order={item} />
+);
 
 export function OrdersScreen() {
   const navigation = useNavigation<NavigationProp<RootTabParamList>>();
@@ -26,9 +32,9 @@ export function OrdersScreen() {
   return (
     <FlatList
       data={orders}
-      keyExtractor={order => order.id}
+      keyExtractor={getOrderKey}
       contentContainerStyle={styles.list}
-      renderItem={({ item }) => <OrderCard order={item} />}
+      renderItem={renderOrder}
     />
   );
 }

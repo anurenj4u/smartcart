@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { spacing } from '@/shared/theme';
 import { AppText } from '@/shared/ui';
@@ -10,7 +11,10 @@ type ProductPriceProps = {
   size?: 'medium' | 'large';
 };
 
-export function ProductPrice({ product, size = 'medium' }: ProductPriceProps) {
+export const ProductPrice = memo(function ProductPriceView({
+  product,
+  size = 'medium',
+}: ProductPriceProps) {
   const { listCents, finalCents, hasDiscount } = getProductPricing(product);
 
   return (
@@ -29,7 +33,7 @@ export function ProductPrice({ product, size = 'medium' }: ProductPriceProps) {
       ) : null}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   row: {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import {
   FlatList,
   Image,
@@ -15,7 +15,10 @@ type ImageGalleryProps = {
   title: string;
 };
 
-export function ImageGallery({ images, title }: ImageGalleryProps) {
+export const ImageGallery = memo(function ImageGalleryView({
+  images,
+  title,
+}: ImageGalleryProps) {
   const { width } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -62,7 +65,7 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
       ) : null}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   image: {

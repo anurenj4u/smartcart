@@ -11,11 +11,12 @@ import { ProductListScreen } from '../ProductListScreen';
 const mockCardRender = jest.fn();
 
 jest.mock('../../components/ProductPrice', () => {
+  const { createElement } = jest.requireActual('react');
   const actual = jest.requireActual('../../components/ProductPrice');
   return {
-    ProductPrice: (props: unknown) => {
+    ProductPrice: (props: object) => {
       mockCardRender();
-      return actual.ProductPrice(props);
+      return createElement(actual.ProductPrice, props);
     },
   };
 });

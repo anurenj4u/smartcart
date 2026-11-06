@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { colors, spacing } from '@/shared/theme';
 import { AppText } from '@/shared/ui';
@@ -8,7 +9,9 @@ type CartSummaryProps = {
   totals: CartTotals;
 };
 
-export function CartSummary({ totals }: CartSummaryProps) {
+export const CartSummary = memo(function CartSummaryView({
+  totals,
+}: CartSummaryProps) {
   return (
     <View style={styles.summary}>
       <View style={styles.row}>
@@ -32,7 +35,7 @@ export function CartSummary({ totals }: CartSummaryProps) {
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   summary: {

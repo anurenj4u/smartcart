@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { colors, radius, spacing } from '@/shared/theme';
 import { AppText } from '@/shared/ui';
@@ -15,7 +16,9 @@ const formatDate = (date: string) =>
     day: 'numeric',
   });
 
-export function ProductReviews({ reviews }: ProductReviewsProps) {
+export const ProductReviews = memo(function ProductReviewsView({
+  reviews,
+}: ProductReviewsProps) {
   return (
     <View style={styles.list}>
       {reviews.map((review, index) => (
@@ -37,7 +40,7 @@ export function ProductReviews({ reviews }: ProductReviewsProps) {
       ))}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   list: {
