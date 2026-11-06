@@ -1,7 +1,7 @@
 import type { ProductFilters, ProductSort } from '@/features/catalog';
 import { toCents } from '@/shared/utils/money';
+import { getProductPricing } from '@/shared/utils/pricing';
 import type { CatalogProduct, ProductsPage } from '../types';
-import { getProductPricing } from './pricing';
 
 const finalCents = (product: CatalogProduct) =>
   getProductPricing(product).finalCents;

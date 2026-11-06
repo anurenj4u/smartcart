@@ -2,8 +2,8 @@ import { StyleSheet, View } from 'react-native';
 import { spacing } from '@/shared/theme';
 import { AppText } from '@/shared/ui';
 import { formatCents } from '@/shared/utils/money';
+import { getProductPricing } from '@/shared/utils/pricing';
 import type { ProductSummary } from '../types';
-import { getProductPricing } from '../utils/pricing';
 
 type ProductPriceProps = {
   product: Pick<ProductSummary, 'price' | 'discountPercentage'>;

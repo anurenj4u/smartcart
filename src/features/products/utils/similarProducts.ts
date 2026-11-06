@@ -1,5 +1,5 @@
+import { getProductPricing } from '@/shared/utils/pricing';
 import type { SimilarCandidate } from '../types';
-import { getProductPricing } from './pricing';
 
 const TAG_WEIGHT = 3;
 const BRAND_WEIGHT = 2;

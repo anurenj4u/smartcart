@@ -2,8 +2,8 @@ import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { colors, radius, spacing } from '@/shared/theme';
 import { AppText } from '@/shared/ui';
 import { formatCents } from '@/shared/utils/money';
+import { getProductPricing } from '@/shared/utils/pricing';
 import type { ProductSummary } from '../types';
-import { getProductPricing } from '../utils/pricing';
 import { ProductPrice } from './ProductPrice';
 import { ProductRating } from './ProductRating';
 

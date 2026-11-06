@@ -1,7 +1,9 @@
-import { toCents } from '@/shared/utils/money';
-import type { ProductSummary } from '../types';
+import { toCents } from './money';
 
-type PricedProduct = Pick<ProductSummary, 'price' | 'discountPercentage'>;
+type PricedProduct = {
+  price: number;
+  discountPercentage: number;
+};
 
 export function getProductPricing({
   price,
