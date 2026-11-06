@@ -1,17 +1,54 @@
 import { useNavigation } from '@react-navigation/native';
-import { Image, ScrollView, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import {
+  Image,
+  KeyboardAvoidingView,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { CartSummary, useCartStore, useCartTotals } from '@/features/cart';
 import type { CartStackNavigation } from '@/shared/navigation/types';
 import { colors, radius, spacing } from '@/shared/theme';
-import { AppText, MessageView } from '@/shared/ui';
+import { AppText, Button, MessageView } from '@/shared/ui';
 import { formatCents } from '@/shared/utils/money';
+import { ShippingForm } from '../components/ShippingForm';
+import { getOrderErrorMessage, usePlaceOrder } from '../hooks/usePlaceOrder';
+import type { ShippingDetails, ShippingErrors } from '../types';
+import { validateShipping } from '../utils/validateShipping';
 
 const IMAGE_SIZE = 56;
+
+const EMPTY_SHIPPING: ShippingDetails = {
+  fullName: '',
+  address: '',
+  city: '',
+  postalCode: '',
+};
 
 export function CheckoutScreen() {
   const navigation = useNavigation<CartStackNavigation>();
   const items = useCartStore(state => state.items);
   const totals = useCartTotals();
+  const placeOrder = usePlaceOrder();
+  const [shipping, setShipping] = useState(EMPTY_SHIPPING);
+  const [errors, setErrors] = useState<ShippingErrors>({});
+
+  const handleChange = (name: keyof ShippingDetails, value: string) => {
+    setShipping(current => ({ ...current, [name]: value }));
+    setErrors(current => ({ ...current, [name]: undefined }));
+  };
+
+  const handlePlaceOrder = () => {
+    const nextErrors = validateShipping(shipping);
+    setErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length === 0) {
+      placeOrder.mutate(items, {
+        onSuccess: () => navigation.popTo('Cart'),
+      });
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -25,44 +62,75 @@ export function CheckoutScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.content}>
-      <View style={styles.section}>
-        <AppText variant="heading">Order summary</AppText>
-        {items.map(item => (
-          <View key={item.productId} style={styles.item}>
-            <Image
-              source={{ uri: item.thumbnail }}
-              style={styles.image}
-              resizeMode="contain"
-            />
-            <View style={styles.itemDetails}>
-              <AppText variant="label" numberOfLines={2}>
-                {item.title}
-              </AppText>
-              <AppText variant="caption" color="textMuted">
-                Qty {item.quantity} × {formatCents(item.unitCents)}
+    <KeyboardAvoidingView behavior="padding" style={styles.screen}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.card}>
+          <AppText variant="heading">Order summary</AppText>
+          {items.map(item => (
+            <View key={item.productId} style={styles.item}>
+              <Image
+                source={{ uri: item.thumbnail }}
+                style={styles.image}
+                resizeMode="contain"
+              />
+              <View style={styles.itemDetails}>
+                <AppText variant="label" numberOfLines={2}>
+                  {item.title}
+                </AppText>
+                <AppText variant="caption" color="textMuted">
+                  Qty {item.quantity} × {formatCents(item.unitCents)}
+                </AppText>
+              </View>
+              <AppText variant="label">
+                {formatCents(item.unitCents * item.quantity)}
               </AppText>
             </View>
-            <AppText variant="label">
-              {formatCents(item.unitCents * item.quantity)}
-            </AppText>
-          </View>
-        ))}
-      </View>
+          ))}
+          <CartSummary totals={totals} />
+        </View>
 
-      <View style={styles.summary}>
-        <CartSummary totals={totals} />
+        <View style={styles.card}>
+          <AppText variant="heading">Shipping details</AppText>
+          <ShippingForm
+            values={shipping}
+            errors={errors}
+            onChange={handleChange}
+          />
+        </View>
+
+        <AppText variant="caption" color="textMuted" style={styles.note}>
+          This is a demo checkout. No payment is taken and nothing is shipped.
+        </AppText>
+      </ScrollView>
+
+      <View style={styles.footer}>
+        {placeOrder.isError ? (
+          <AppText color="danger" style={styles.note}>
+            {getOrderErrorMessage(placeOrder.error)}
+          </AppText>
+        ) : null}
+        <Button
+          label={`Place order · ${formatCents(totals.totalCents)}`}
+          loading={placeOrder.isPending}
+          onPress={handlePlaceOrder}
+        />
       </View>
-    </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
   content: {
     gap: spacing.lg,
     padding: spacing.md,
   },
-  section: {
+  card: {
     gap: spacing.md,
     padding: spacing.md,
     backgroundColor: colors.surface,
@@ -85,11 +153,14 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: spacing.xs,
   },
-  summary: {
+  note: {
+    textAlign: 'center',
+  },
+  footer: {
+    gap: spacing.sm,
     padding: spacing.md,
     backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
   },
 });
