@@ -1,29 +1,50 @@
+import type { ProductFilters } from '@/features/catalog';
 import { request } from '@/shared/api';
-import type { Product, ProductsPage } from '../types';
+import type { CatalogProduct, Product, ProductsPage } from '../types';
 
 const SUMMARY_FIELDS = 'title,price,discountPercentage,rating,stock,thumbnail';
+const CATALOG_FIELDS = `${SUMMARY_FIELDS},description,category`;
 
 type GetProductsParams = {
   skip: number;
   limit: number;
-  category?: string | null;
+  filters: ProductFilters;
   signal?: AbortSignal;
 };
 
 export function getProducts({
   skip,
   limit,
-  category,
+  filters,
   signal,
 }: GetProductsParams) {
-  const path = category
-    ? `/products/category/${encodeURIComponent(category)}`
-    : '/products';
+  const { query, category } = filters;
+  let path = '/products';
+
+  if (query) {
+    path = '/products/search';
+  } else if (category) {
+    path = `/products/category/${encodeURIComponent(category)}`;
+  }
 
   return request<ProductsPage>(path, {
-    params: { skip, limit, select: SUMMARY_FIELDS },
+    params: {
+      q: query || undefined,
+      skip,
+      limit,
+      select: SUMMARY_FIELDS,
+    },
     signal,
   });
+}
+
+export async function getCatalog(signal?: AbortSignal) {
+  const { products } = await request<{ products: CatalogProduct[] }>(
+    '/products',
+    { params: { limit: 0, select: CATALOG_FIELDS }, signal },
+  );
+
+  return products;
 }
 
 export function getProductById(id: number, signal?: AbortSignal) {

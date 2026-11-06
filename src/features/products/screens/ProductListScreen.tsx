@@ -1,7 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
-import { CategoryBar } from '@/features/catalog';
+import { CategoryBar, SearchBar, useProductFilters } from '@/features/catalog';
 import { getErrorMessage } from '@/shared/api';
 import type { ShopStackParamList } from '@/shared/navigation/types';
 import { colors, spacing } from '@/shared/theme';
@@ -14,7 +14,14 @@ import type { ProductSummary } from '../types';
 type Props = NativeStackScreenProps<ShopStackParamList, 'ProductList'>;
 
 export function ProductListScreen({ navigation }: Props) {
-  const [category, setCategory] = useState<string | null>(null);
+  const {
+    filters,
+    searchText,
+    setSearchText,
+    setCategory,
+    hasActiveFilters,
+    reset,
+  } = useProductFilters();
   const {
     data: products,
     error,
@@ -26,17 +33,18 @@ export function ProductListScreen({ navigation }: Props) {
     isPlaceholderData,
     isRefetchError,
     refetch,
-  } = useProducts(category);
+    refresh,
+  } = useProducts(filters);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const listRef = useRef<FlatList<ProductSummary>>(null);
 
   useEffect(() => {
     listRef.current?.scrollToOffset({ offset: 0, animated: false });
-  }, [category]);
+  }, [filters]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await refetch();
+    await refresh();
     setIsRefreshing(false);
   };
 
@@ -73,6 +81,8 @@ export function ProductListScreen({ navigation }: Props) {
         data={products}
         numColumns={2}
         keyExtractor={item => String(item.id)}
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
         style={isPlaceholderData && styles.updating}
         contentContainerStyle={styles.content}
         onEndReached={handleEndReached}
@@ -102,7 +112,9 @@ export function ProductListScreen({ navigation }: Props) {
         ListEmptyComponent={
           <MessageView
             title="No products found"
-            description="Try a different category."
+            description="Try a different search or category."
+            actionLabel={hasActiveFilters ? 'Clear filters' : undefined}
+            onAction={reset}
           />
         }
         renderItem={({ item }) => (
@@ -121,7 +133,10 @@ export function ProductListScreen({ navigation }: Props) {
 
   return (
     <View style={styles.screen}>
-      <CategoryBar selected={category} onSelect={setCategory} />
+      <View style={styles.searchRow}>
+        <SearchBar value={searchText} onChangeText={setSearchText} />
+      </View>
+      <CategoryBar selected={filters.category} onSelect={setCategory} />
       <View style={styles.results}>{renderResults()}</View>
     </View>
   );
@@ -130,6 +145,12 @@ export function ProductListScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    paddingTop: spacing.sm,
   },
   results: {
     flex: 1,

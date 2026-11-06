@@ -1,22 +1,47 @@
 import {
   keepPreviousData,
   useInfiniteQuery,
+  useQueryClient,
   type InfiniteData,
 } from '@tanstack/react-query';
-import { getProducts } from '../api/productsApi';
+import type { ProductFilters } from '@/features/catalog';
+import { getCatalog, getProducts } from '../api/productsApi';
 import { productKeys } from '../api/queryKeys';
 import type { ProductsPage } from '../types';
+import {
+  filterCatalog,
+  needsCatalog,
+  paginate,
+} from '../utils/productFilters';
 
 const PAGE_SIZE = 20;
 
 const flattenPages = (data: InfiniteData<ProductsPage>) =>
   data.pages.flatMap(page => page.products);
 
-export function useProducts(category: string | null) {
-  return useInfiniteQuery({
-    queryKey: productKeys.list(category),
-    queryFn: ({ pageParam, signal }) =>
-      getProducts({ skip: pageParam, limit: PAGE_SIZE, category, signal }),
+export function useProducts(filters: ProductFilters) {
+  const queryClient = useQueryClient();
+  const usesCatalog = needsCatalog(filters);
+
+  const query = useInfiniteQuery({
+    queryKey: productKeys.list(filters),
+    queryFn: async ({ pageParam, signal }) => {
+      if (!usesCatalog) {
+        return getProducts({
+          skip: pageParam,
+          limit: PAGE_SIZE,
+          filters,
+          signal,
+        });
+      }
+
+      const catalog = await queryClient.fetchQuery({
+        queryKey: productKeys.catalog(),
+        queryFn: ({ signal: catalogSignal }) => getCatalog(catalogSignal),
+      });
+
+      return paginate(filterCatalog(catalog, filters), pageParam, PAGE_SIZE);
+    },
     initialPageParam: 0,
     getNextPageParam: lastPage => {
       const nextSkip = lastPage.skip + lastPage.products.length;
@@ -27,4 +52,16 @@ export function useProducts(category: string | null) {
     select: flattenPages,
     placeholderData: keepPreviousData,
   });
+
+  const refresh = async () => {
+    if (usesCatalog) {
+      await queryClient.invalidateQueries({
+        queryKey: productKeys.catalog(),
+        refetchType: 'none',
+      });
+    }
+    await query.refetch();
+  };
+
+  return { ...query, refresh };
 }

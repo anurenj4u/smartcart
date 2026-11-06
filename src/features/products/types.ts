@@ -28,6 +28,11 @@ export type Product = ProductSummary & {
   reviews: ProductReview[];
 };
 
+export type CatalogProduct = ProductSummary & {
+  description: string;
+  category: string;
+};
+
 export type ProductsPage = {
   products: ProductSummary[];
   total: number;
