@@ -38,6 +38,7 @@ export function ProductListScreen({ navigation }: Props) {
     hasNextPage,
     isFetchingNextPage,
     isFetchNextPageError,
+    isPaused,
     isPending,
     isPlaceholderData,
     isRefetchError,
@@ -70,6 +71,15 @@ export function ProductListScreen({ navigation }: Props) {
   };
 
   const renderResults = () => {
+    if (isPaused && (isPending || isPlaceholderData)) {
+      return (
+        <MessageView
+          title="You're offline"
+          description="These products aren't saved yet. They'll load when you reconnect."
+        />
+      );
+    }
+
     if (isPending) {
       return <LoadingView />;
     }
@@ -114,7 +124,8 @@ export function ProductListScreen({ navigation }: Props) {
         }
         ListFooterComponent={
           <ProductListFooter
-            isLoading={isFetchingNextPage}
+            isLoading={isFetchingNextPage && !isPaused}
+            isOffline={isFetchingNextPage && isPaused}
             hasError={isFetchNextPageError}
             onRetry={() => fetchNextPage()}
           />

@@ -19,9 +19,10 @@ type SimilarProductsProps = {
 };
 
 export function SimilarProducts({ product, onSelect }: SimilarProductsProps) {
-  const { similarProducts, isPending, refetch } = useSimilarProducts(product);
+  const { similarProducts, isPaused, isPending, refetch } =
+    useSimilarProducts(product);
 
-  if (similarProducts?.length === 0) {
+  if (similarProducts?.length === 0 || (isPending && isPaused)) {
     return null;
   }
 

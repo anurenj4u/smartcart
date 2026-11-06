@@ -4,12 +4,14 @@ import { AppText, Button } from '@/shared/ui';
 
 type ProductListFooterProps = {
   isLoading: boolean;
+  isOffline: boolean;
   hasError: boolean;
   onRetry: () => void;
 };
 
 export function ProductListFooter({
   isLoading,
+  isOffline,
   hasError,
   onRetry,
 }: ProductListFooterProps) {
@@ -17,6 +19,16 @@ export function ProductListFooter({
     return (
       <View style={styles.container}>
         <ActivityIndicator color={colors.primary} />
+      </View>
+    );
+  }
+
+  if (isOffline) {
+    return (
+      <View style={styles.container}>
+        <AppText color="textMuted">
+          More products will load when you reconnect.
+        </AppText>
       </View>
     );
   }

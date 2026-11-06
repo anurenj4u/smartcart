@@ -20,9 +20,19 @@ export function ProductDetailsScreen({ navigation, route }: Props) {
   const {
     data: product,
     error,
+    isPaused,
     isPending,
     refetch,
   } = useProduct(route.params.productId);
+
+  if (isPending && isPaused) {
+    return (
+      <MessageView
+        title="You're offline"
+        description="This product isn't saved yet. It'll load when you reconnect."
+      />
+    );
+  }
 
   if (isPending) {
     return <LoadingView />;

@@ -14,6 +14,7 @@ export const queryClient = new QueryClient({
       retryDelay: attempt => Math.min(1000 * 2 ** attempt, MAX_RETRY_DELAY_MS),
     },
     mutations: {
+      networkMode: 'always',
       retry: false,
     },
   },

@@ -1,13 +1,17 @@
 import {
   keepPreviousData,
+  onlineManager,
   useInfiniteQuery,
   useQueryClient,
   type InfiniteData,
 } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import type { ProductFilters } from '@/features/catalog';
+import { ApiError } from '@/shared/api';
+import { useIsOnline } from '@/shared/network/online';
 import { getCatalog, getProducts } from '../api/productsApi';
 import { productKeys } from '../api/queryKeys';
-import type { ProductsPage } from '../types';
+import type { CatalogProduct, ProductsPage } from '../types';
 import { filterCatalog, needsCatalog, paginate } from '../utils/productFilters';
 
 const PAGE_SIZE = 20;
@@ -18,7 +22,27 @@ const flattenPages = (data: InfiniteData<ProductsPage>) =>
 
 export function useProducts(filters: ProductFilters) {
   const queryClient = useQueryClient();
-  const usesCatalog = needsCatalog(filters);
+  const isOnline = useIsOnline();
+  const hasCatalog =
+    queryClient.getQueryData(productKeys.catalog()) !== undefined;
+  const usesCatalog = needsCatalog(filters) || (!isOnline && hasCatalog);
+
+  const fetchCatalog = () =>
+    queryClient.fetchQuery({
+      queryKey: productKeys.catalog(),
+      queryFn: ({ signal }) => getCatalog(signal),
+      staleTime: CATALOG_STALE_TIME_MS,
+    });
+
+  useEffect(() => {
+    if (isOnline) {
+      queryClient.prefetchQuery({
+        queryKey: productKeys.catalog(),
+        queryFn: ({ signal }) => getCatalog(signal),
+        staleTime: CATALOG_STALE_TIME_MS,
+      });
+    }
+  }, [isOnline, queryClient]);
 
   const query = useInfiniteQuery({
     queryKey: productKeys.list(filters),
@@ -32,11 +56,17 @@ export function useProducts(filters: ProductFilters) {
         });
       }
 
-      const catalog = await queryClient.fetchQuery({
-        queryKey: productKeys.catalog(),
-        queryFn: ({ signal: catalogSignal }) => getCatalog(catalogSignal),
-        staleTime: CATALOG_STALE_TIME_MS,
-      });
+      const cachedCatalog = queryClient.getQueryData<CatalogProduct[]>(
+        productKeys.catalog(),
+      );
+
+      if (!onlineManager.isOnline() && !cachedCatalog) {
+        throw new ApiError('network', 'The catalog is not available offline');
+      }
+
+      const catalog = onlineManager.isOnline()
+        ? await fetchCatalog()
+        : cachedCatalog!;
 
       return paginate(filterCatalog(catalog, filters), pageParam, PAGE_SIZE);
     },
@@ -49,9 +79,14 @@ export function useProducts(filters: ProductFilters) {
     },
     select: flattenPages,
     placeholderData: keepPreviousData,
+    networkMode: usesCatalog ? 'offlineFirst' : 'online',
   });
 
   const refresh = async () => {
+    if (!onlineManager.isOnline()) {
+      return;
+    }
+
     if (usesCatalog) {
       await queryClient.invalidateQueries({
         queryKey: productKeys.catalog(),

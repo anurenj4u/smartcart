@@ -1,4 +1,8 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {
+  BottomTabBar,
+  createBottomTabNavigator,
+  type BottomTabBarProps,
+} from '@react-navigation/bottom-tabs';
 import {
   DefaultTheme,
   NavigationContainer,
@@ -9,6 +13,7 @@ import { useCartItemCount } from '@/features/cart';
 import { OrdersScreen } from '@/features/orders';
 import { WishlistScreen } from '@/features/wishlist';
 import type { RootTabParamList } from '@/shared/navigation/types';
+import { OfflineBanner } from '@/shared/network/OfflineBanner';
 import { colors } from '@/shared/theme';
 import { CartNavigator } from './CartNavigator';
 import { ShopNavigator } from './ShopNavigator';
@@ -42,12 +47,20 @@ const OrdersIcon = ({ color, size }: TabIconProps) => (
   <ReceiptText color={color} size={size} />
 );
 
+const renderTabBar = (props: BottomTabBarProps) => (
+  <>
+    <OfflineBanner />
+    <BottomTabBar {...props} />
+  </>
+);
+
 export function RootNavigator() {
   const cartItemCount = useCartItemCount();
 
   return (
     <NavigationContainer theme={navigationTheme}>
       <Tab.Navigator
+        tabBar={renderTabBar}
         screenOptions={{
           tabBarActiveTintColor: colors.primary,
           tabBarInactiveTintColor: colors.textMuted,

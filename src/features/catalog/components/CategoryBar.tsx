@@ -15,7 +15,17 @@ type CategoryBarProps = {
 };
 
 export function CategoryBar({ selected, onSelect }: CategoryBarProps) {
-  const { data: categories, isPending, refetch } = useCategories();
+  const { data: categories, isPaused, isPending, refetch } = useCategories();
+
+  if (isPending && isPaused) {
+    return (
+      <View style={styles.status}>
+        <AppText variant="caption" color="textMuted">
+          Categories will load when you reconnect.
+        </AppText>
+      </View>
+    );
+  }
 
   if (isPending) {
     return (
