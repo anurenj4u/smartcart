@@ -7,6 +7,7 @@ import type { CartItem, CartProduct } from '../types';
 type CartState = {
   items: CartItem[];
   addItem: (product: CartProduct) => void;
+  setQuantity: (productId: number, quantity: number) => void;
   removeItem: (productId: number) => void;
   clear: () => void;
 };
@@ -47,6 +48,17 @@ export const useCartStore = create<CartState>()(
               }
             : { items: [...items, toCartItem(product, 1)] };
         }),
+      setQuantity: (productId, quantity) =>
+        set(({ items }) => ({
+          items:
+            quantity <= 0
+              ? items.filter(item => item.productId !== productId)
+              : items.map(item =>
+                  item.productId === productId
+                    ? { ...item, quantity: Math.min(quantity, item.stock) }
+                    : item,
+                ),
+        })),
       removeItem: productId =>
         set(({ items }) => ({
           items: items.filter(item => item.productId !== productId),
