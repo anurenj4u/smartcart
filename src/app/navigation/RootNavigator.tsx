@@ -16,6 +16,7 @@ import type { RootTabParamList } from '@/shared/navigation/types';
 import { OfflineBanner } from '@/shared/network/OfflineBanner';
 import { colors } from '@/shared/theme';
 import { CartNavigator } from './CartNavigator';
+import { handleNavigationReady, navigationRef } from './navigationRef';
 import { ShopNavigator } from './ShopNavigator';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -58,7 +59,11 @@ export function RootNavigator() {
   const cartItemCount = useCartItemCount();
 
   return (
-    <NavigationContainer theme={navigationTheme}>
+    <NavigationContainer
+      ref={navigationRef}
+      onReady={handleNavigationReady}
+      theme={navigationTheme}
+    >
       <Tab.Navigator
         tabBar={renderTabBar}
         screenOptions={{

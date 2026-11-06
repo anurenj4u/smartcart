@@ -9,7 +9,7 @@ import {
   getReminderTimestamp,
 } from '../utils/reminderPolicy';
 
-const REMINDER_ID = 'abandoned-cart';
+export const CART_REMINDER_ID = 'abandoned-cart';
 const CHANNEL_ID = 'cart-reminders';
 
 export async function scheduleCartReminder(itemCount: number): Promise<void> {
@@ -27,7 +27,7 @@ export async function scheduleCartReminder(itemCount: number): Promise<void> {
 
   await notifee.createTriggerNotification(
     {
-      id: REMINDER_ID,
+      id: CART_REMINDER_ID,
       ...getReminderContent(itemCount),
       android: {
         channelId,
@@ -41,4 +41,8 @@ export async function scheduleCartReminder(itemCount: number): Promise<void> {
       timestamp: getReminderTimestamp(Date.now()),
     },
   );
+}
+
+export function cancelCartReminder(): Promise<void> {
+  return notifee.cancelNotification(CART_REMINDER_ID);
 }
