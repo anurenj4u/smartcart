@@ -18,9 +18,9 @@ const formatDate = (date: string) =>
 export function ProductReviews({ reviews }: ProductReviewsProps) {
   return (
     <View style={styles.list}>
-      {reviews.map(review => (
+      {reviews.map((review, index) => (
         <View
-          key={`${review.reviewerName}-${review.date}`}
+          key={`${index}-${review.reviewerName}-${review.date}`}
           style={styles.review}
         >
           <View style={styles.header}>
