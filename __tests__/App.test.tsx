@@ -10,10 +10,11 @@ import { queryClient } from '@/shared/api';
 const emptyPage = { products: [], total: 0, skip: 0, limit: 20 };
 
 beforeEach(() => {
-  globalThis.fetch = jest.fn(async () => ({
+  globalThis.fetch = jest.fn(async (url: string) => ({
     ok: true,
     status: 200,
-    text: async () => JSON.stringify(emptyPage),
+    text: async () =>
+      JSON.stringify(url.includes('/categories') ? [] : emptyPage),
   })) as unknown as typeof fetch;
 });
 
