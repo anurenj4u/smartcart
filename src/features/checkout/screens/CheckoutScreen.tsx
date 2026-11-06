@@ -1,3 +1,4 @@
+import { useHeaderHeight } from '@react-navigation/elements';
 import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 import {
@@ -28,6 +29,7 @@ const EMPTY_SHIPPING: ShippingDetails = {
 
 export function CheckoutScreen() {
   const navigation = useNavigation<CartStackNavigation>();
+  const headerHeight = useHeaderHeight();
   const items = useCartStore(state => state.items);
   const totals = useCartTotals();
   const placeOrder = usePlaceOrder();
@@ -74,7 +76,11 @@ export function CheckoutScreen() {
   }
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.screen}>
+    <KeyboardAvoidingView
+      behavior="padding"
+      keyboardVerticalOffset={headerHeight}
+      style={styles.screen}
+    >
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
