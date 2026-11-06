@@ -4,8 +4,10 @@ import { getErrorMessage } from '@/shared/api';
 import type { ShopStackParamList } from '@/shared/navigation/types';
 import { spacing } from '@/shared/theme';
 import { AppText, LoadingView, MessageView } from '@/shared/ui';
+import { ImageGallery } from '../components/ImageGallery';
 import { ProductPrice } from '../components/ProductPrice';
 import { ProductRating } from '../components/ProductRating';
+import { ProductReviews } from '../components/ProductReviews';
 import { useProduct } from '../hooks/useProduct';
 import { getStockLabel } from '../utils/stock';
 
@@ -34,8 +36,12 @@ export function ProductDetailsScreen({ route }: Props) {
     );
   }
 
+  const images = product.images.length > 0 ? product.images : [product.thumbnail];
+
   return (
     <ScrollView contentContainerStyle={styles.content}>
+      <ImageGallery images={images} title={product.title} />
+
       <View style={styles.summary}>
         {product.brand ? (
           <AppText variant="label" color="textMuted">
@@ -52,16 +58,40 @@ export function ProductDetailsScreen({ route }: Props) {
           {getStockLabel(product.stock)}
         </AppText>
       </View>
+
+      <View style={styles.section}>
+        <AppText variant="heading">Description</AppText>
+        <AppText>{product.description}</AppText>
+      </View>
+
+      <View style={styles.section}>
+        <AppText variant="heading">Delivery and returns</AppText>
+        <AppText>{product.shippingInformation}</AppText>
+        <AppText>{product.warrantyInformation}</AppText>
+        <AppText>{product.returnPolicy}</AppText>
+      </View>
+
+      {product.reviews.length > 0 ? (
+        <View style={styles.section}>
+          <AppText variant="heading">Reviews</AppText>
+          <ProductReviews reviews={product.reviews} />
+        </View>
+      ) : null}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   content: {
+    gap: spacing.xl,
     paddingBottom: spacing.xxl,
   },
   summary: {
     gap: spacing.sm,
-    padding: spacing.lg,
+    paddingHorizontal: spacing.lg,
+  },
+  section: {
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
   },
 });
