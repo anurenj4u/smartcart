@@ -13,6 +13,7 @@ export type ShopStackParamList = {
 export type CartStackParamList = {
   Cart: undefined;
   Checkout: undefined;
+  OrderConfirmation: { orderId: string };
 };
 
 export type RootTabParamList = {

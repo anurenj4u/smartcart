@@ -40,15 +40,27 @@ export function CheckoutScreen() {
   };
 
   const handlePlaceOrder = () => {
+    if (placeOrder.isPending) {
+      return;
+    }
+
     const nextErrors = validateShipping(shipping);
     setErrors(nextErrors);
 
     if (Object.keys(nextErrors).length === 0) {
-      placeOrder.mutate(items, {
-        onSuccess: () => navigation.popTo('Cart'),
-      });
+      placeOrder.mutate(
+        { items, shipping },
+        {
+          onSuccess: order =>
+            navigation.replace('OrderConfirmation', { orderId: order.id }),
+        },
+      );
     }
   };
+
+  if (placeOrder.isSuccess) {
+    return null;
+  }
 
   if (items.length === 0) {
     return (
