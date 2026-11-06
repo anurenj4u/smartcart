@@ -1,10 +1,13 @@
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
-import { FlatList, StyleSheet } from 'react-native';
+import { Heart } from 'lucide-react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import type { RootTabParamList } from '@/shared/navigation/types';
-import { spacing } from '@/shared/theme';
-import { MessageView } from '@/shared/ui';
-import { WishlistItemRow } from '../components/WishlistItemRow';
+import { colors, radius, spacing } from '@/shared/theme';
+import { AppText, Button } from '@/shared/ui';
+import { WishlistCard } from '../components/WishlistCard';
 import { useWishlistStore } from '../store/wishlistStore';
+
+const EMPTY_ICON_SIZE = 96;
 
 export function WishlistScreen() {
   const navigation = useNavigation<NavigationProp<RootTabParamList>>();
@@ -12,33 +15,51 @@ export function WishlistScreen() {
 
   if (items.length === 0) {
     return (
-      <MessageView
-        title="Your wishlist is empty"
-        description="Tap the heart on a product to save it here."
-        actionLabel="Browse products"
-        onAction={() =>
-          navigation.navigate('ShopTab', { screen: 'ProductList' })
-        }
-      />
+      <View style={styles.empty}>
+        <View style={styles.emptyIcon}>
+          <Heart size={40} color={colors.primary} />
+        </View>
+        <AppText variant="title" style={styles.centered}>
+          Your wishlist is empty
+        </AppText>
+        <AppText color="textMuted" style={styles.centered}>
+          Tap the heart on any product to save it for later.
+        </AppText>
+        <Button
+          label="Browse products"
+          onPress={() =>
+            navigation.navigate('ShopTab', { screen: 'ProductList' })
+          }
+          style={styles.emptyAction}
+        />
+      </View>
     );
   }
 
   return (
     <FlatList
       data={items}
+      numColumns={2}
       keyExtractor={item => String(item.id)}
       contentContainerStyle={styles.list}
+      ListHeaderComponent={
+        <AppText color="textMuted" style={styles.count}>
+          {items.length} saved {items.length === 1 ? 'item' : 'items'}
+        </AppText>
+      }
       renderItem={({ item }) => (
-        <WishlistItemRow
-          item={item}
-          onPress={() =>
-            navigation.navigate('ShopTab', {
-              screen: 'ProductDetails',
-              params: { productId: item.id },
-              initial: false,
-            })
-          }
-        />
+        <View style={styles.cell}>
+          <WishlistCard
+            item={item}
+            onPress={() =>
+              navigation.navigate('ShopTab', {
+                screen: 'ProductDetails',
+                params: { productId: item.id },
+                initial: false,
+              })
+            }
+          />
+        </View>
       )}
     />
   );
@@ -46,7 +67,37 @@ export function WishlistScreen() {
 
 const styles = StyleSheet.create({
   list: {
-    gap: spacing.md,
-    padding: spacing.md,
+    padding: spacing.xs,
+  },
+  count: {
+    paddingHorizontal: spacing.sm,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.xs,
+  },
+  cell: {
+    width: '50%',
+    padding: spacing.xs,
+  },
+  empty: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    padding: spacing.xl,
+  },
+  emptyIcon: {
+    width: EMPTY_ICON_SIZE,
+    height: EMPTY_ICON_SIZE,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.md,
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: radius.pill,
+  },
+  centered: {
+    textAlign: 'center',
+  },
+  emptyAction: {
+    marginTop: spacing.lg,
   },
 });

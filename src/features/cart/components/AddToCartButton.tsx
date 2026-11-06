@@ -8,26 +8,46 @@ import { QuantityStepper } from './QuantityStepper';
 
 type AddToCartButtonProps = {
   product: CartProduct;
+  compact?: boolean;
 };
 
-export function AddToCartButton({ product }: AddToCartButtonProps) {
+export function AddToCartButton({
+  product,
+  compact = false,
+}: AddToCartButtonProps) {
   const quantity = useCartItemQuantity(product.id);
   const addItem = useCartStore(state => state.addItem);
   const setQuantity = useCartStore(state => state.setQuantity);
+  const buttonStyle = compact ? styles.compactButton : undefined;
 
   if (product.stock === 0) {
-    return <Button label="Out of stock" disabled onPress={() => undefined} />;
+    return (
+      <Button
+        label="Out of stock"
+        disabled
+        onPress={() => undefined}
+        style={buttonStyle}
+      />
+    );
   }
 
   if (quantity === 0) {
-    return <Button label="Add to cart" onPress={() => addItem(product)} />;
+    return (
+      <Button
+        label="Add to cart"
+        onPress={() => addItem(product)}
+        style={buttonStyle}
+      />
+    );
   }
 
   return (
-    <View style={styles.inCart}>
-      <AppText variant="label" color="primary">
-        In your cart
-      </AppText>
+    <View style={compact ? styles.compactInCart : styles.inCart}>
+      {compact ? null : (
+        <AppText variant="label" color="primary">
+          In your cart
+        </AppText>
+      )}
       <QuantityStepper
         label={product.title}
         quantity={quantity}
@@ -45,5 +65,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.md,
+  },
+  compactButton: {
+    paddingHorizontal: spacing.sm,
+  },
+  compactInCart: {
+    minHeight: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
