@@ -1,6 +1,12 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useEffect, useRef, useState } from 'react';
-import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  View,
+  type ListRenderItem,
+} from 'react-native';
 import {
   CategoryBar,
   FilterButton,
@@ -18,6 +24,12 @@ import { useProducts } from '../hooks/useProducts';
 import type { ProductSummary } from '../types';
 
 type Props = NativeStackScreenProps<ShopStackParamList, 'ProductList'>;
+
+const INITIAL_ITEMS = 6;
+const ITEMS_PER_BATCH = 6;
+const WINDOW_SIZE = 7;
+
+const getItemKey = (product: ProductSummary) => String(product.id);
 
 export function ProductListScreen({ navigation }: Props) {
   const {
@@ -52,6 +64,20 @@ export function ProductListScreen({ navigation }: Props) {
   useEffect(() => {
     listRef.current?.scrollToOffset({ offset: 0, animated: false });
   }, [filters]);
+
+  const openProduct = useCallback(
+    (productId: number) => navigation.navigate('ProductDetails', { productId }),
+    [navigation],
+  );
+
+  const renderItem = useCallback<ListRenderItem<ProductSummary>>(
+    ({ item }) => (
+      <View style={styles.cell}>
+        <ProductCard product={item} onPress={openProduct} />
+      </View>
+    ),
+    [openProduct],
+  );
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -100,7 +126,7 @@ export function ProductListScreen({ navigation }: Props) {
         ref={listRef}
         data={products}
         numColumns={2}
-        keyExtractor={item => String(item.id)}
+        keyExtractor={getItemKey}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
         style={isPlaceholderData && styles.updating}
@@ -138,16 +164,11 @@ export function ProductListScreen({ navigation }: Props) {
             onAction={reset}
           />
         }
-        renderItem={({ item }) => (
-          <View style={styles.cell}>
-            <ProductCard
-              product={item}
-              onPress={() =>
-                navigation.navigate('ProductDetails', { productId: item.id })
-              }
-            />
-          </View>
-        )}
+        renderItem={renderItem}
+        initialNumToRender={INITIAL_ITEMS}
+        maxToRenderPerBatch={ITEMS_PER_BATCH}
+        windowSize={WINDOW_SIZE}
+        removeClippedSubviews
       />
     );
   };

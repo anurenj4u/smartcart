@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { WishlistButton } from '@/features/wishlist';
 import { colors, radius, spacing } from '@/shared/theme';
@@ -10,10 +11,13 @@ import { ProductRating } from './ProductRating';
 
 type ProductCardProps = {
   product: ProductSummary;
-  onPress: () => void;
+  onPress: (productId: number) => void;
 };
 
-export function ProductCard({ product, onPress }: ProductCardProps) {
+export const ProductCard = memo(function ProductCardView({
+  product,
+  onPress,
+}: ProductCardProps) {
   const { finalCents } = getProductPricing(product);
 
   return (
@@ -22,7 +26,7 @@ export function ProductCard({ product, onPress }: ProductCardProps) {
       accessibilityLabel={`${product.title}, ${formatCents(
         finalCents,
       )}, rated ${product.rating.toFixed(1)} out of 5`}
-      onPress={onPress}
+      onPress={() => onPress(product.id)}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <Image
@@ -47,7 +51,7 @@ export function ProductCard({ product, onPress }: ProductCardProps) {
       </View>
     </Pressable>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {

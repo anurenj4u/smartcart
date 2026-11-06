@@ -54,7 +54,7 @@ export function SimilarProducts({ product, onSelect }: SimilarProductsProps) {
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <ProductCard product={item} onPress={() => onSelect(item.id)} />
+            <ProductCard product={item} onPress={onSelect} />
           </View>
         )}
       />
