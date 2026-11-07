@@ -56,7 +56,18 @@ cd android
 gradlew.bat assembleRelease
 ```
 
-The APK ends up in `android/app/build/outputs/apk/release/app-release.apk`. Release builds include the JavaScript bundle, so they run without Metro. It's signed with the debug key, so it's only meant for local testing.
+This writes one APK per CPU architecture to `android/app/build/outputs/apk/release/`, plus a larger `app-universal-release.apk` that also runs on x86 emulators. Pick the one that matches the device.
+
+To get a single APK for sharing that works on ARM phones (about 36 MB, and it won't run on x86 emulators):
+
+```bash
+cd android
+./gradlew assembleRelease -PphonesOnly "-PreactNativeArchitectures=arm64-v8a,armeabi-v7a"
+```
+
+On Windows, use `gradlew.bat` in that command. The APK ends up at `android/app/build/outputs/apk/release/app-release.apk`, and the build removes the per-architecture APKs from that folder.
+
+Release builds include the JavaScript bundle, so they run without Metro. They're signed with the debug key, so they're only meant for local testing.
 
 ## Useful commands
 
