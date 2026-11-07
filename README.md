@@ -1,97 +1,85 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# SmartCart
 
-# Getting Started
+SmartCart is a shopping app built with React Native. It uses the [DummyJSON](https://dummyjson.com/docs) API for product data and is set up for Android.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+You can browse and search products, filter by category, price and rating, save items to a wishlist, and go through a simulated checkout. The cart, wishlist and orders are saved on the device, the catalog stays available offline, and the app sends a reminder if you leave something in your cart.
 
-## Step 1: Start Metro
+## Setup
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+You'll need:
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- Node.js 22.11 or newer
+- JDK 17
+- Android Studio with Android SDK Platform 37 and Build Tools 37.0.0
+- NDK 27.1.12297006
+- An emulator or phone running Android 7.0 (API 24) or newer
 
-```sh
-# Using npm
+Make sure `ANDROID_HOME` points to your Android SDK, then install the dependencies:
+
+```bash
+npm install
+```
+
+## Running the app
+
+Start an emulator or connect a phone, then start Metro:
+
+```bash
 npm start
-
-# OR using Yarn
-yarn start
 ```
 
-## Step 2: Build and run your app
+In a second terminal, build and install the app:
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
+```bash
 npm run android
-
-# OR using Yarn
-yarn android
 ```
 
-### iOS
+The first build compiles native code for every architecture, so it can take 15 minutes or more. If you're only using an emulator, you can build just its architecture, which is much quicker:
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+```bash
+npm run android -- --active-arch-only
 ```
 
-Then, and every time you update your native dependencies, run:
+## Building a release APK
 
-```sh
-bundle exec pod install
+On macOS or Linux:
+
+```bash
+cd android
+./gradlew assembleRelease
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+On Windows:
 
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+```bash
+cd android
+gradlew.bat assembleRelease
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+The APK ends up in `android/app/build/outputs/apk/release/app-release.apk`. Release builds include the JavaScript bundle, so they run without Metro. It's signed with the debug key, so it's only meant for local testing.
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## Useful commands
 
-## Step 3: Modify your app
+```bash
+npm test          # run the tests
+npm run lint      # run ESLint
+npx tsc --noEmit  # check types
+```
 
-Now that you have successfully run the app, let's make changes!
+## Troubleshooting
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+**Red screen saying `Can't find ViewManager`**
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+The installed app is older than your native dependencies. Run `npm run android` again to rebuild and reinstall it.
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+**Stuck on "Loading from Metro" or a `Compiling JS failed` error**
 
-## Congratulations! :tada:
+This usually means the machine is short on memory, often because a Gradle build is running at the same time. Let the build finish or stop it with `gradlew --stop` from the `android` folder, then restart Metro and reload the app.
 
-You've successfully run and modified your React Native App. :partying_face:
+**The app can't connect to Metro on a real phone**
 
-### Now what?
+Connect over USB and run:
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+```bash
+adb reverse tcp:8081 tcp:8081
+```
