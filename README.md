@@ -83,3 +83,66 @@ Connect over USB and run:
 ```bash
 adb reverse tcp:8081 tcp:8081
 ```
+
+## Project structure
+
+The code is organized by feature, so everything for the cart, for example, lives in one place.
+
+```text
+src/
+  app/        App entry, navigation and providers
+  features/
+    products/       Product list, details and similar products
+    catalog/        Categories, search, sorting and filters
+    cart/           Cart store, totals and cart screen
+    wishlist/       Saved products
+    checkout/       Shipping form, placing orders and confirmation
+    orders/         Order history
+    notifications/  Abandoned cart reminders
+  shared/     API client, storage, theme and reusable UI
+```
+
+Dependencies only go one way, so there are no import cycles between features:
+
+```text
+app -> features -> shared
+
+products      -> catalog, cart, wishlist
+wishlist      -> cart
+checkout      -> cart, orders
+notifications -> cart
+```
+
+Features import each other through their `index.ts` file, and `shared` never imports from a feature or from `app`. ESLint checks both rules.
+
+## State management
+
+State is split by where the data comes from.
+
+| State | Managed by |
+|---|---|
+| Products and categories | TanStack Query |
+| Cart, wishlist and orders | Zustand, saved with MMKV |
+| Search text and filters | Local React state |
+
+I chose Zustand over Redux Toolkit because TanStack Query already handles caching, loading states and retries for server data. That leaves only a few small client stores, and Redux would add more structure than they need.
+
+Zustand also fits this app well in a few specific ways:
+
+- Components subscribe to just the values they use, so tapping a wishlist heart only re-renders that heart.
+- The `persist` middleware saves a store with very little code.
+- Stores can be used outside React, which the reminder logic relies on.
+
+MMKV reads synchronously, so the saved cart is ready as soon as the app opens.
+
+## How it works
+
+**Search and filters.** DummyJSON can't combine search with a category, and it has no price or rating filters. Simple requests go to the server with normal pagination. Anything more complex filters the full catalog on the device instead, and both paths return the same page format, so the list doesn't need to know the difference. Price sorting always runs on the device, because the server sorts by list price while the app shows the discounted price. Search waits 400ms after the last keystroke before running.
+
+**Prices.** Money is calculated in integer cents to avoid floating point errors.
+
+**Similar products.** There's no API for this, so the app fetches the product's category and ranks the results. Shared tags count the most, followed by brand, price closeness and rating. Sold-out products are moved down the list.
+
+**Offline.** Product data is cached with MMKV and restored on launch, and the full catalog is loaded in the background so search and filters still work offline. A banner shows when there's no connection, and anything that isn't saved yet loads automatically after reconnecting. Placing an order offline shows an error and keeps the cart. Failed requests are retried on network and server errors, but not on other client errors.
+
+**Reminders.** Changing the cart schedules a reminder, using one fixed notification ID so that a new reminder replaces the old one. Clearing the cart or completing a purchase cancels it, and tapping the notification opens the cart. The delay is 2 hours in release builds and 1 minute in debug builds, which makes it easy to test.
