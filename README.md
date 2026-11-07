@@ -4,6 +4,26 @@ SmartCart is a shopping app built with React Native. It uses the [DummyJSON](htt
 
 You can browse and search products, filter by category, price and rating, save items to a wishlist, and go through a simulated checkout. The cart, wishlist and orders are saved on the device, the catalog stays available offline, and the app sends a reminder if you leave something in your cart.
 
+## Screenshots
+
+<p>
+  <img src="docs/demo/product-list.png" width="200" alt="Product list" />
+  <img src="docs/demo/product-details.png" width="200" alt="Product details" />
+  <img src="docs/demo/cart.png" width="200" alt="Cart" />
+  <img src="docs/demo/wishlist.png" width="200" alt="Wishlist" />
+</p>
+<p>
+  <img src="docs/demo/checkout.png" width="200" alt="Checkout" />
+  <img src="docs/demo/orders.png" width="200" alt="Order history" />
+  <img src="docs/demo/offline.png" width="200" alt="Offline banner" />
+  <img src="docs/demo/notification.png" width="200" alt="Cart reminder notification" />
+</p>
+
+## Demo
+
+- [Main demo](docs/demo/smartcart-demo.mp4) (2 minutes): browsing, search, filters, product details, wishlist, cart, checkout and order history.
+- [Cart reminder](docs/demo/cart-reminder.mp4) (1.5 minutes): adding an item, leaving the app, getting the reminder and tapping it to open the cart. This was recorded with a debug build, where the reminder comes after 1 minute instead of 2 hours.
+
 ## Setup
 
 You'll need:
@@ -157,3 +177,9 @@ MMKV reads synchronously, so the saved cart is ready as soon as the app opens.
 **Offline.** Product data is cached with MMKV and restored on launch, and the full catalog is loaded in the background so search and filters still work offline. A banner shows when there's no connection, and anything that isn't saved yet loads automatically after reconnecting. Placing an order offline shows an error and keeps the cart. Failed requests are retried on network and server errors, but not on other client errors.
 
 **Reminders.** Changing the cart schedules a reminder, using one fixed notification ID so that a new reminder replaces the old one. Clearing the cart or completing a purchase cancels it, and tapping the notification opens the cart. The delay is 2 hours in release builds and 1 minute in debug builds, which makes it easy to test.
+
+## Performance
+
+List items are memoized, callbacks are kept stable, and components subscribe only to the store values they use, so changing one item doesn't re-render the rest of the list. The product list's `FlatList` is tuned to render in small batches and keep fewer off-screen rows mounted.
+
+[docs/performance.md](docs/performance.md) has the details, React DevTools Profiler results for scrolling, searching, the wishlist and the cart, before and after numbers, and a couple of things that could still be improved. The Profiler screenshots and recordings are in [docs/profiler](docs/profiler).
