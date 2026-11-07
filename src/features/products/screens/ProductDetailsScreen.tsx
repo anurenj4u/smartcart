@@ -6,11 +6,12 @@ import { WishlistButton } from '@/features/wishlist';
 import { getErrorMessage } from '@/shared/api';
 import type { ShopStackParamList } from '@/shared/navigation/types';
 import { colors, spacing } from '@/shared/theme';
-import { AppText, LoadingView, MessageView } from '@/shared/ui';
+import { AppText, MessageView } from '@/shared/ui';
 import { ImageGallery } from '../components/ImageGallery';
 import { ProductPrice } from '../components/ProductPrice';
 import { ProductRating } from '../components/ProductRating';
 import { ProductReviews } from '../components/ProductReviews';
+import { ProductDetailsSkeleton } from '../components/ProductSkeletons';
 import { SimilarProducts } from '../components/SimilarProducts';
 import { useProduct } from '../hooks/useProduct';
 import { getStockLabel } from '../utils/stock';
@@ -47,7 +48,7 @@ export function ProductDetailsScreen({ navigation, route }: Props) {
   }
 
   if (isPending) {
-    return <LoadingView />;
+    return <ProductDetailsSkeleton />;
   }
 
   if (!product) {

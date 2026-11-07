@@ -17,9 +17,10 @@ import {
 import { getErrorMessage } from '@/shared/api';
 import type { ShopStackParamList } from '@/shared/navigation/types';
 import { colors, spacing } from '@/shared/theme';
-import { AppText, LoadingView, MessageView } from '@/shared/ui';
+import { AppText, MessageView } from '@/shared/ui';
 import { ProductCard } from '../components/ProductCard';
 import { ProductListFooter } from '../components/ProductListFooter';
+import { ProductListSkeleton } from '../components/ProductSkeletons';
 import { useProducts } from '../hooks/useProducts';
 import type { ProductSummary } from '../types';
 
@@ -107,7 +108,7 @@ export function ProductListScreen({ navigation }: Props) {
     }
 
     if (isPending) {
-      return <LoadingView />;
+      return <ProductListSkeleton />;
     }
 
     if (!products) {

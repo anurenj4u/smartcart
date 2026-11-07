@@ -46,7 +46,7 @@ export const WishlistCard = memo(function WishlistCardView({
           </View>
         ) : null}
         <View style={styles.details}>
-          <AppText variant="label" numberOfLines={2} style={styles.title}>
+          <AppText variant="label" numberOfLines={2}>
             {item.title}
           </AppText>
           <View style={styles.price}>
@@ -121,9 +121,6 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     paddingHorizontal: spacing.md,
     paddingTop: spacing.md,
-  },
-  title: {
-    minHeight: 36,
   },
   price: {
     flexDirection: 'row',

@@ -1,13 +1,10 @@
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
-import { colors, spacing } from '@/shared/theme';
-import { AppText, Chip } from '@/shared/ui';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { radius, spacing } from '@/shared/theme';
+import { AppText, Chip, Skeleton } from '@/shared/ui';
 import { useCategories } from '../hooks/useCategories';
+
+const CHIP_HEIGHT = 40;
+const CHIP_WIDTHS = [56, 88, 112, 96, 104];
 
 type CategoryBarProps = {
   selected: string | null;
@@ -29,8 +26,15 @@ export function CategoryBar({ selected, onSelect }: CategoryBarProps) {
 
   if (isPending) {
     return (
-      <View style={styles.status}>
-        <ActivityIndicator color={colors.primary} />
+      <View accessibilityLabel="Loading categories" style={styles.loading}>
+        {CHIP_WIDTHS.map((width, index) => (
+          <Skeleton
+            key={index}
+            width={width}
+            height={CHIP_HEIGHT}
+            borderRadius={radius.pill}
+          />
+        ))}
       </View>
     );
   }
@@ -82,6 +86,12 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.sm,
+  },
+  loading: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    padding: spacing.sm,
+    overflow: 'hidden',
   },
   status: {
     minHeight: 56,

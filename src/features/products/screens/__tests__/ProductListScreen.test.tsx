@@ -52,6 +52,18 @@ describe('ProductListScreen', () => {
       expect(screen.getByText('4.3')).toBeTruthy();
     });
 
+    it('shows skeletons until products load', async () => {
+      mockApi([makeProduct(1, { title: 'Blue Mug' })]);
+      renderScreen();
+
+      expect(screen.getByLabelText('Loading products')).toBeTruthy();
+      expect(screen.getByLabelText('Loading categories')).toBeTruthy();
+
+      await screen.findByText('Blue Mug');
+
+      expect(screen.queryByLabelText('Loading products')).toBeNull();
+    });
+
     it('labels products that are out of stock', async () => {
       mockApi([makeProduct(1, { stock: 0 })]);
       renderScreen();

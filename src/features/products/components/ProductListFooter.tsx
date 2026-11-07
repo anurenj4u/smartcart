@@ -1,6 +1,7 @@
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { colors, spacing } from '@/shared/theme';
+import { StyleSheet, View } from 'react-native';
+import { spacing } from '@/shared/theme';
 import { AppText, Button } from '@/shared/ui';
+import { ProductListFooterSkeleton } from './ProductSkeletons';
 
 type ProductListFooterProps = {
   isLoading: boolean;
@@ -16,11 +17,7 @@ export function ProductListFooter({
   onRetry,
 }: ProductListFooterProps) {
   if (isLoading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator color={colors.primary} />
-      </View>
-    );
+    return <ProductListFooterSkeleton />;
   }
 
   if (isOffline) {

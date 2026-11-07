@@ -1,16 +1,11 @@
 import { memo } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  View,
-} from 'react-native';
-import { colors, spacing } from '@/shared/theme';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { spacing } from '@/shared/theme';
 import { AppText } from '@/shared/ui';
 import { useSimilarProducts } from '../hooks/useSimilarProducts';
 import type { Product } from '../types';
 import { ProductCard } from './ProductCard';
+import { ProductCardSkeleton } from './ProductSkeletons';
 
 const CARD_WIDTH = 168;
 
@@ -32,7 +27,19 @@ export const SimilarProducts = memo(function SimilarProductsView({
 
   const renderContent = () => {
     if (isPending) {
-      return <ActivityIndicator color={colors.primary} style={styles.status} />;
+      return (
+        <View
+          accessibilityLabel="Loading similar products"
+          style={styles.loading}
+        >
+          <View style={styles.card}>
+            <ProductCardSkeleton />
+          </View>
+          <View style={styles.card}>
+            <ProductCardSkeleton />
+          </View>
+        </View>
+      );
     }
 
     if (!similarProducts) {
@@ -88,6 +95,11 @@ const styles = StyleSheet.create({
   },
   card: {
     width: CARD_WIDTH,
+  },
+  loading: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
   },
   status: {
     minHeight: 56,
